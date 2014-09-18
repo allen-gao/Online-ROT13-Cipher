@@ -15,27 +15,29 @@
 # limitations under the License.
 #
 import webapp2
-import cgi
+import jinja2
+import os
 
-form="""
-<h3>Welcome to Allen's ROT13 Cipher!</h3>
-<form method="post">
-Enter some text to ROT13: 
-<br>
-<textarea style="height: 100px; width: 400px;" name="text" placeholder="Enter your message here">%(old_text)s</textarea>
-<br>
-<input type="submit" value="Click here to submit!">
-"""
+template_dir= os.path.join(os.path.dirname(__file__), 'templates')
+jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), autoescape = True)
 
+# The following Handler class is obtained from CS253 on Udacity
+class Handler(webapp2.RequestHandler):
+	def write(self, *a, **kw):
+		self.response.out.write(*a, **kw)
+	def render_str(self, template, **params):
+		t = jinja_env.get_template(template)
+		return t.render(params)
+	def render(self, template, **kw):
+		self.write(self.render_str(template, **kw))
 
-class MainHandler(webapp2.RequestHandler):
+class MainHandler(Handler):
     def get(self):
-        self.response.write(form % {"old_text": ""})
+        self.render("main_page.html", old_text="")
     def post(self):
     	old = self.request.get("text")
     	old = rot(old)
-    	old = escape_html(old)
-    	self.response.write(form % {"old_text": old})
+    	self.render("main_page.html", old_text=old)
 
 
 def rot(s):
@@ -56,8 +58,6 @@ def rot(s):
 			i += 1
 	return new
 
-def escape_html(s):
-	return cgi.escape(s, quote = True)
 
 
 app = webapp2.WSGIApplication([('/', MainHandler)], debug=True)
