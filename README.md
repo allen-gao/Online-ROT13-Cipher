@@ -1,6 +1,7 @@
 ROT13 Cipher
 ====
 A ROT13 cipher created with the webapp2 Python framework in Google App Engine, with the help of CS253 on Udacity.
+You can check out the site here: http://allen-rot13.appspot.com/
 ****
 **(For developers) To deploy this site locally:**
 
